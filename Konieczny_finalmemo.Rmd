@@ -1,0 +1,142 @@
+---
+title: "Story memo"
+author: "Rachel Konieczny"
+date: "4/10/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library (tidyverse)
+library (janitor)
+library (lubridate)
+
+```
+
+## Methodology
+
+Documentation and sourcing of the data can be found here: https://github.com/nytimes/covid-19-data This data is derived from The New York Times and is an ongoing repository of data on Coronavirus cases and deaths in the U.S., analyzed in the context of the 2019 American Community Survey's estimates of college population.
+
+```{r}
+counties <-
+  read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties-recent.csv")
+
+```
+
+
+```{r}
+counties %>%
+  clean_names() %>%
+  glimpse()
+
+
+```
+
+```{r}
+census <-
+  read_csv("https://cronkitedata.s3.amazonaws.com/csv/acs5year_2019_bycounty.csv")
+
+
+```
+
+
+```{r}
+census %>%
+  clean_names() %>%
+  glimpse()
+
+
+```
+
+## Combining the two dataframes
+
+```{r}
+counties_with_census <-
+  counties %>%
+  inner_join (census , by=c("fips" = "fips") ) %>%
+  clean_names() %>%
+  glimpse() 
+  
+
+```
+
+## Answering the hypothesis
+
+How does the Covid death rate in counties with a large population of college students compare to the Covid death rate in counties with a small population of college students?
+
+```{r}
+death_rate <-
+  counties_with_census %>%
+  mutate(death_rate = deaths / cases * 100) %>%
+  clean_names() %>%
+  glimpse()
+
+
+```
+
+
+```{r}
+death_rate %>%
+  filter(pct_in_college >= 35.0)
+
+
+```
+
+```{r}
+death_rate %>%
+  filter(pct_in_college < 5)
+
+
+```
+
+
+```{r}
+covid_latest <- 
+  counties_with_census %>%
+  filter (date == "2022-04-15") %>%
+  glimpse()
+
+
+```
+
+How does the number of Covid deaths compare for the Covid eras of pre-Delta, Delta, and Omicron?
+
+```{r}
+ covid_eras <-
+  counties %>%
+  mutate ( era = 
+           case_when (date == "2021-06-30"  ~ "Pre-Delta", 
+                  date == "2021-12-31"   ~ "Delta", 
+                  date == "2021-04-15" ~ "Omicron"
+               )
+  ) 
+  
+
+```
+
+
+```{r}
+covid_changes <-
+  covid_eras %>%
+  group_by ( fips ) %>%
+  arrange (fips, date) %>%
+  mutate ( net_increase = if_else ( row_number() == 1, 
+                                    cases, 
+                                    cases - lag(cases)), 
+           total_cases = last(cases) , 
+           total_deaths = last(deaths)
+           ) %>%
+  ungroup() %>%
+  select ( fips, state, county,total_cases, total_deaths,
+           net_increase, era, date) %>%
+  pivot_wider (
+     id_cols=c(fips:total_deaths), 
+     names_from = era,
+     values_from = net_increase
+  ) %>%
+  glimpse ()
+
+```
+
+

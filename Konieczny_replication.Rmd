@@ -1,0 +1,163 @@
+---
+title: "Data replication"
+author: "Rachel Konieczny"
+date: "2/28/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library (tidyverse)
+library (readxl)
+library (janitor)
+library (lubridate)
+
+```
+
+## Bringing in the data
+
+```{r}
+
+payouts<-
+read_excel("payouts.xlsx", skip = 1)
+
+
+```
+
+```{r}
+payouts %>%
+  clean_names() %>%
+  glimpse () 
+
+```
+
+## Data replication
+
+Beyond the mammoth cases, a pileup of other large payouts has padded the tab, a Times analysis of city payouts found. While the total number of payouts has dipped over time, the average amount has increased. Last budget year, the city paid out 30 settlements of $1 million or more--five times as many as a decade before.
+
+
+This shows that 30 settlements of $1 million or more were paid in 2017.
+
+```{r}
+payouts %>%
+  filter (AMOUNT >= 1000000) %>%
+  filter (`FISCAL YEAR` == 2017)
+
+
+```
+
+This shows that 6 settlements of $1 million or more were paid in 2007.
+
+```{r}
+payouts %>%
+  filter (AMOUNT >= 1000000) %>%
+  filter (`FISCAL YEAR` == 2007)
+
+
+```
+
+Los Angeles has spent soaring amounts in recent years to end legal disputes over dangerous roads, police misconduct and other alleged wrongdoing, depriving the city of money that could fund other pressing needs.
+
+
+This shows the amount Los Angeles has spent to end legal disputes over dangerous roads.
+
+```{r}
+payouts %>%
+  filter (`CASE TYPE` == "Dangerous Condition - Roadway Maintenance")
+  
+
+```
+
+This shows the amount Los Angeles has spent to end disputes over police misconduct.
+
+```{r}
+payouts %>%
+  filter (`CASE TYPE` == "Civil Rights - Not otherwise classified")
+
+
+```
+
+Lawsuits tied to the city departments that oversee its streets and sidewalks, including the Bureau of Street Services and the Department of Transportation, accounted for a growing share. Legal payouts for "dangerous conditions" have rivaled and, last budget year, even exceeded the cost of lawsuits over police misconduct, the analysis found.
+
+
+This shows lawsuits involving the Bureau of Street Services.
+
+```{r}
+payouts %>%
+  filter (DEPARTMENT == "Public Works / Bureau of Street Services")
+
+
+```
+
+This shows lawsuits involving the Department of Transportation.
+
+```{r}
+payouts %>%
+  filter (DEPARTMENT == "Department of Transportation")
+
+
+```
+
+The following show the legal payouts for dangerous conditions in 2017.
+
+```{r}
+payouts %>%
+  filter (`CASE TYPE` == "Dangerous Condition - Tree") %>%
+  filter (`FISCAL YEAR` == 2017)
+
+
+```
+
+
+```{r}
+payouts %>%
+  filter (`CASE TYPE` == "Dangerous Condition - Sewer Related") %>%
+  filter (`FISCAL YEAR` == 2017)
+
+
+```
+
+```{r}
+payouts %>%
+  filter (`CASE TYPE` == "Dangerous Condition - Street Lighting") %>%
+  filter (`FISCAL YEAR` == 2017)
+
+
+```
+
+```{r}
+payouts %>%
+  filter (`CASE TYPE` == "Dangerous Condition - Other") %>%
+  filter (`FISCAL YEAR` == 2017)
+
+
+```
+
+```{r}
+payouts %>%
+  filter (`CASE TYPE` == "Dangerous Condition - Traffic Control Signal") %>%
+  filter (`FISCAL YEAR` == 2017)
+
+
+```
+
+```{r}
+payouts %>%
+  filter (`CASE TYPE` == "Dangerous Condition - Roadway Maintenance") %>%
+  filter (`FISCAL YEAR` == 2017)
+
+
+```
+
+This shows the legal payouts for lawsuits involving police misconduct.
+
+```{r}
+payouts %>%
+  filter (`CASE TYPE` == "Civil Rights - Not otherwise classified")
+ 
+
+```
+
+
+
